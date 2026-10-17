@@ -35,7 +35,7 @@
 
 ## 로컬 처리와 저장
 
-- 얼굴 추적: MediaPipe Face Landmarker 0.10.32, 모델과 WASM 모두 저장소에 포함. CPU에서 낮은 빈도로 실행하여 태블릿 부하를 줄였습니다.
+- 얼굴 추적: MediaPipe Face Landmarker 0.10.32. 모델과 WASM은 빌드 단계에서 준비하고 SHA-256을 검증해 배포 파일에 포함합니다. CPU에서 낮은 빈도로 실행하여 태블릿 부하를 줄였습니다.
 - 전면카메라 영상은 단말 메모리에서 얼굴 위치 안내에만 사용하며 녹화·저장·전송하지 않습니다. 마이크 권한을 요청하지 않습니다.
 - 얼굴 위치·거리 보조 기능입니다. 치아의 청결도, 칫솔 압력, 치실 접촉, 실제 닦은 치아를 판정하지 않습니다. 인식 실패는 타이머나 보상에 불이익을 주지 않습니다.
 - 음성은 OS에 설치된 한국어 음성 중 `localService` 음성만 사용합니다. 오프라인 음성이 없거나 OS에서 재생을 허용하지 않으면 화면 안내를 사용합니다. 필요하면 기기의 한국어 음성을 먼저 다운로드합니다.
@@ -51,12 +51,15 @@ Node.js 22 이상:
 
 ```sh
 npm ci --ignore-scripts
+npm run prepare:offline
 npm run check
 npm test
 npm run build
 ```
 
-`dist/`가 배포 가능한 정적 결과물입니다. `vendor/`와 `models/`가 이미 포함되어 있어 런타임에 npm/CDN 다운로드가 없습니다. 빌드는 같은 파일을 원본과 `dist`에 완전한 캐시 목록으로 기록합니다.
+`dist/`가 배포 가능한 정적 결과물입니다. `prepare:offline`은 고정된 npm 패키지에서 WASM을 복사하고 Google 공식 주소에서 버전 1 얼굴 모델을 내려받습니다. 세 파일 모두 `ASSET-CHECKSUMS.json`의 SHA-256과 일치해야 빌드를 진행할 수 있습니다. 이미 준비된 파일이 일치하면 다시 내려받지 않습니다. 최초 개발 준비와 GitHub 빌드는 인터넷 연결이 필요합니다.
+
+배포 결과물에는 `vendor/`와 `models/`가 모두 포함되어 런타임에 npm/CDN 다운로드가 없습니다. 빌드는 같은 파일을 원본과 `dist`에 완전한 캐시 목록으로 기록합니다.
 
 로컬 수동 시험은 `npm run build` 후 `python3 -m http.server 4173 --directory dist`로 localhost에서 열 수 있습니다. 다른 기기에서 개발 서버의 일반 HTTP IP 주소를 열면 카메라가 막힐 수 있으므로 iPad 시험은 GitHub Pages HTTPS 주소를 사용하세요.
 

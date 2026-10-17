@@ -1,0 +1,19 @@
+{
+  "name": "olympus-brush",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Offline-first Greek mythology brushing companion",
+  "scripts": {
+    "prepare:offline": "node scripts/prepare-offline.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "build": "node scripts/build.mjs",
+    "check": "node --check app.js && node --check core.js && node --check camera.js && node --check db.js && node --check sw.js",
+    "dev": "python3 -m http.server 4173"
+  },
+  "devDependencies": {
+    "@mediapipe/tasks-vision": "0.10.32",
+    "fake-indexeddb": "6.2.4",
+    "linkedom": "0.18.12"
+  }
+}
