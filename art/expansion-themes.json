@@ -1,0 +1,170 @@
+[
+  {
+    "id": "sea",
+    "name": "포세이돈의 바다 궁전",
+    "scene": "Underwater pearl and turquoise Greek palace, coral along the edges, sunlight through water, distant fish. A marble floor fills the foreground.",
+    "items": [
+      "산호 삼지창",
+      "조개 분수",
+      "돌고래 조각",
+      "진주 보물함",
+      "산호 화병",
+      "바다의 벽화"
+    ],
+    "english": [
+      "golden trident on a small coral stand",
+      "pearl shell fountain",
+      "turquoise dolphin sculpture",
+      "open pearl treasure chest",
+      "coral-filled amphora",
+      "circular painting of a peaceful underwater palace"
+    ]
+  },
+  {
+    "id": "moon",
+    "name": "아르테미스의 달빛 숲",
+    "scene": "Moonlit enchanted forest glade, silver birches, lavender sky, crescent moon, mossy stone floor in foreground and a graceful ruined Greek arch.",
+    "items": [
+      "은빛 활",
+      "달빛 사슴",
+      "초승달 나무",
+      "별꽃 화분",
+      "숲속 등불",
+      "달의 벽화"
+    ],
+    "english": [
+      "silver bow and quiver on a stand",
+      "silver deer statuette",
+      "small luminous crescent tree in a pot",
+      "starflower flowerpot",
+      "forest lantern with fireflies",
+      "circular moonlit forest painting"
+    ]
+  },
+  {
+    "id": "sun",
+    "name": "아폴론의 태양 신전",
+    "scene": "Golden Greek temple interior open to a rosy sunset, pale amber marble, laurel pillars, radiant sun ornament high above. Wide clean floor foreground.",
+    "items": [
+      "태양의 리라",
+      "월계관 받침",
+      "황금 백조",
+      "햇살 오르간",
+      "호박빛 등잔",
+      "태양의 벽화"
+    ],
+    "english": [
+      "ornate sun-shaped golden lyre",
+      "laurel wreath on marble stand",
+      "golden swan statuette",
+      "small Greek fantasy pipe organ",
+      "amber oil lamp",
+      "circular painting of a sun above a Greek temple"
+    ]
+  },
+  {
+    "id": "wisdom",
+    "name": "아테나의 지혜 도서관",
+    "scene": "Dreamlike ancient Greek library, shelves of scrolls and books on side walls, pale sage and ivory marble, high windows, peaceful warm light, open floor foreground.",
+    "items": [
+      "지혜의 부엉이",
+      "두루마리 함",
+      "작은 책장",
+      "천구의",
+      "올리브 등잔",
+      "지혜의 벽화"
+    ],
+    "english": [
+      "owl statuette on two books",
+      "scroll chest with rolled parchments",
+      "small freestanding bookcase",
+      "brass celestial globe on stand",
+      "olive branch oil lamp",
+      "circular painting of an owl and olive branches"
+    ]
+  },
+  {
+    "id": "harvest",
+    "name": "데메테르의 꽃 들판",
+    "scene": "Dreamlike Greek countryside flower meadow courtyard, wheat fields and fruit orchards beyond a stone balustrade, pale peach and sage, abundant flowers along edges, open terracotta floor foreground.",
+    "items": [
+      "황금 밀 바구니",
+      "꽃수레",
+      "석류나무",
+      "풍요의 뿔",
+      "나비 분수",
+      "풍요의 벽화"
+    ],
+    "english": [
+      "basket of golden wheat",
+      "small flower cart",
+      "small pomegranate tree in a pot",
+      "cornucopia of fruit",
+      "butterfly garden fountain",
+      "circular painting of flowers and wheat"
+    ]
+  },
+  {
+    "id": "forge",
+    "name": "헤파이스토스의 보석 공방",
+    "scene": "Cozy magical Greek artisan forge, bronze pipes and gemstone shelves at edges, warm copper and teal, gentle glowing hearth at rear side, open stone floor foreground. Welcoming not industrial.",
+    "items": [
+      "청동 모루",
+      "황금 자동인형",
+      "보석 화로",
+      "수정 망치",
+      "태엽 부엉이",
+      "불꽃의 벽화"
+    ],
+    "english": [
+      "bronze anvil with decorative engraving",
+      "cute small golden Greek automaton",
+      "gemstone brazier with gentle orange glow",
+      "crystal-headed hammer on stand",
+      "clockwork bronze owl",
+      "circular painting of ruby and amber flames"
+    ]
+  },
+  {
+    "id": "cloud",
+    "name": "헤르메스의 구름 항구",
+    "scene": "Floating Greek marble island terrace above fluffy white clouds, sky bridges and distant airships, pale blue gold and cream, elegant wing motifs, open marble floor foreground.",
+    "items": [
+      "날개 신발",
+      "여행자의 가방",
+      "구름 표지석",
+      "날개 우편함",
+      "하늘 나침반",
+      "여행의 벽화"
+    ],
+    "english": [
+      "pair of golden winged sandals",
+      "leather travel satchel with rolled map",
+      "cloud-shaped stone signpost without letters",
+      "winged Greek mailbox",
+      "sky compass on elegant pedestal",
+      "circular painting of floating cloud islands"
+    ]
+  },
+  {
+    "id": "stars",
+    "name": "별빛 천상 궁전",
+    "scene": "Celestial Greek palace terrace in space, indigo violet and silver, Milky Way beyond curved balustrades, marble star inlays, elegant silver columns at edges, open floor foreground.",
+    "items": [
+      "별자리 지구본",
+      "천마 조각",
+      "은하수 등불",
+      "별빛 수정",
+      "초승달 의자",
+      "은하수 벽화"
+    ],
+    "english": [
+      "constellation globe on golden stand",
+      "white winged Pegasus statuette",
+      "Milky Way lantern",
+      "cluster of luminous star crystals",
+      "crescent moon chair",
+      "circular painting of the Milky Way"
+    ]
+  }
+]

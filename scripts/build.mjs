@@ -1,7 +1,7 @@
 import {cp,mkdir,rm,readFile,writeFile,readdir,stat} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import {join} from 'node:path';
-const files=['index.html','styles.css','app.js','core.js','db.js','camera.js','manifest.webmanifest'];
+const files=['index.html','styles.css','app.js','catalog.js','sprite-ratios.js','core.js','db.js','camera.js','manifest.webmanifest'];
 await rm('dist',{recursive:true,force:true});await mkdir('dist',{recursive:true});
 for(const f of [...files,'assets','vendor','models'])await cp(f,join('dist',f),{recursive:true});
 await writeFile('dist/.nojekyll','');
