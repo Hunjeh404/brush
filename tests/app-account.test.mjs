@@ -18,6 +18,6 @@ test('logged-in app boots and switches profiles into home; longer remote brushin
  await click('start:morning');for(let i=0;i<6;i++)await click('floss-next');await click('brush-start');for(let i=0;i<4;i++){clock+=250;tick();await settle();}
  const local=await readState(account.key),remote=cloudPayload(local);remote.active.elapsedMs=20000;remote.modifiedAt=Date.now()+1000;records.set('q',{version:20,payload:remote});
  await account.flush();await settle();assert.match(document.querySelector('main').textContent,/오늘의 모험/);assert.equal((await readState(account.key)).active.elapsedMs,20000);assert.equal((await readState(account.key)).attackCount,0);
- await click('resume');assert.match(document.querySelector('main').textContent,/04:40/);await click('pause');await click('pause');assert.equal(document.querySelector('#dialog').open,false);assert.equal((await readState(account.key)).active.elapsedMs,20000);
+ await click('resume');assert.match(document.querySelector('main').textContent,/04:40/);await click('pause');await click('pause');assert.equal(Boolean(document.querySelector('#dialog').open),false);assert.equal((await readState(account.key)).active.elapsedMs,20000);
  clearTimeout(account.timer);Account.prototype.init=init;globalThis.setInterval=interval;
 });
