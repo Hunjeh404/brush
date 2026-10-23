@@ -2,6 +2,7 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {parseHTML} from 'linkedom';import 'fake-indexeddb/auto';
 import {readFile} from 'node:fs/promises';import {setImmediate as yieldTask} from 'node:timers/promises';
+import {Account} from '../account.js';
 import {openDB,writeState,readState,createAuth} from '../db.js';import {defaultState} from '../core.js';
 test('complete app flow: floss → pause/resume → completion → decorating → locked settings → explicit early exit',async()=>{
  const {window}=parseHTML(await readFile(new URL('../index.html',import.meta.url),'utf8'));const {document}=window;
@@ -15,6 +16,9 @@ test('complete app flow: floss → pause/resume → completion → decorating �
  async function click(action){const btn=document.querySelector(`[data-action="${action}"]`);assert.ok(btn,`missing action ${action}`);assert.equal(!!btn.disabled,false,`disabled ${action}`);btn.dispatchEvent(new window.Event('click',{bubbles:true}));await settle();}
  async function advance(ms){for(let t=0;t<ms;t+=250){clock+=250;tick();if(t%1000===0)await settle();}await settle();}
  await settle();assert.match(document.querySelector('main').textContent,/오늘의 모험/);
+ const originalAction=Account.prototype.action;let accountAction;Account.prototype.action=async action=>{accountAction=action;};
+ await click('account');await click('account:login');assert.equal(accountAction,'login','Google login action reaches Account rather than reopening the account page');
+ Account.prototype.action=originalAction;await click('home');
  await click('start:morning');assert.match(document.querySelector('main').textContent,/윗니 오른쪽/);
  for(let i=0;i<6;i++)await click('floss-next');assert.match(document.querySelector('main').textContent,/양치 시작/);
  await click('brush-start');await advance(1000);assert.equal(document.querySelector('#remaining').textContent,'01:59');

@@ -5,3 +5,5 @@
 - Development/test-only: linkedom (ISC), fake-indexeddb (Apache-2.0), installed by the lockfile; not loaded by the deployed app.
 
 Application artwork provenance is listed separately in ASSET-SOURCES.md.
+
+- Supabase JavaScript SDK 2.117.3 (`vendor/supabase.mjs`) — Supabase, MIT License; see `vendor/LICENSE-SUPABASE.txt`. Bundled locally with esbuild 0.25.12 (MIT, development only).
