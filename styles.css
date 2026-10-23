@@ -55,3 +55,10 @@
 .garden-scene.world-stars .garden-slot.center{top:20.8%;width:12.3%;}.garden-scene.world-stars .garden-slot.left{left:20.6%;bottom:55%;width:16%;}.garden-scene.world-stars .garden-slot.right{left:79.5%;bottom:55%;width:16%;}
 
 .slot-art .scene-object.sprite{object-fit:contain;object-position:center bottom}
+
+/* Center the icon independently of the text baseline. */
+.lock{display:grid;place-items:center;padding:0;line-height:1;flex-shrink:0}
+.lock:before{content:none}
+.lock svg{display:block;width:24px;height:24px}
+@media(max-width:600px){.lock svg{width:21px;height:21px}}
+.update-state{display:block;margin-top:5px;font-size:12px}.update-check{font-size:12px;padding:4px 6px}.app-version{font-size:12px}

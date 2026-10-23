@@ -3,6 +3,9 @@ import {SLOT_NAMES as PLACE_NAMES} from './catalog.js';
 import {migrateState,visitWorld,unlockWorld,removePlaced,WORLDS,SLOTS,DEFAULTS,ITEMS,AREAS,FLOSS,SLOT_NAMES,dayKey,defaultState,normalizeSettings,routineSlots,startSession,advanceFloss,guideFor,recordCompleted,endEarly,repair,purchasePlace,validateBackup} from './core.js';
 import {openDB,readState,writeState,createAuth,verifyPassword} from './db.js';
 import {CameraGuide} from './camera.js';
+import {AppUpdater} from './app-update.js';
+import {APP_VERSION} from './version.js';
+let updater,updateStatus='';
 const app=document.querySelector('#app'),dialog=document.querySelector('#dialog');
 let state,revision=0,saveChain=Promise.resolve(),saveFailed=false,screen='home',running=false,lastTick=0,lastSaved=0,cam=null,parentUnlocked=false,editing=false,selected='olive',lastResult=null,lastGuide='',itemFilter='all',collectionTab='worlds',offlineReady=false,setupRecovery='',wakeLock=null,spokenAt=0;
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -18,9 +21,10 @@ function releaseWake(){wakeLock?.release().catch(()=>{});wakeLock=null;}
 function showDialog(title,body){dialog.innerHTML=`<div class="dialog-body"><h2>${title}</h2>${body}</div>`;if(!dialog.open)dialog.showModal();}
 function closeDialog(){dialog.close();dialog.innerHTML='';}
 function showScreen(name){if(screen==='settings'&&name!=='settings')parentUnlocked=false;screen=name;render();window.scrollTo(0,0);}
-function header(subtitle='모으고 꾸미는 나만의 신화 세계'){return `<header class="masthead"><div><p class="eyebrow">OLYMPUS · DAILY ADVENTURE</p><h1>올림포스 양치 모험</h1><p>${subtitle}</p></div>${state?.auth?button('<span aria-hidden="true">♙</span><span class="sr-only">부모 설정</span>','parent','lock','aria-label="부모 설정"'):''}</header>`;}
+function settingsIcon(){return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.7"/>${Array.from({length:8},(_,i)=>`<path d="M12 2v3" transform="rotate(${i*45} 12 12)"/>`).join('')}</svg>`;}
+function header(subtitle='모으고 꾸미는 나만의 신화 세계'){return `<header class="masthead"><div><p class="eyebrow">OLYMPUS · DAILY ADVENTURE</p><h1>올림포스 양치 모험</h1><p>${subtitle}</p></div>${state?.auth?button(settingsIcon(),'parent','lock','aria-label="부모 설정"'):''}</header>`;}
 function nav(active='home'){return `<nav class="bottom-nav" aria-label="주 메뉴">${[['home','오늘의 모험','☀'],['garden','나의 올림포스','♜'],['collection','수집함','✧']].map(([id,name,icon])=>button(`<span aria-hidden="true">${icon}</span>${name}`,id,active===id?'nav-item active':'nav-item')).join('')}</nav>`;}
-function frame(html,active){return `${header()}<main>${html}</main>${active?nav(active):''}<footer><span class="offline-state">${offlineReady?'오프라인 준비 완료':'오프라인 파일 확인 중'}</span> · 이 기기에 저장</footer>`;}
+function frame(html,active){return `${header()}<main>${html}</main>${active?nav(active):''}<footer><span class="offline-state">${offlineReady?'오프라인 준비 완료':'오프라인 파일 확인 중'}</span> · 이 기기에 저장<br><span class="app-version">v${APP_VERSION}</span> · ${button('업데이트 확인','check-update','text update-check')}<span class="update-state" role="status">${esc(updateStatus)}</span></footer>`;}
 function coach(name,text){return `<section class="coach">${img(name==='아리아드네'?'ariadne.webp':'athena.webp','portrait',name)}<div><p class="eyebrow">${name}의 안내</p><p class="coach-text">${text}</p></div></section>`;}
 function stepper(step){return `<ol class="steps"><li class="${step==='floss'?'current':'done'}">${step==='floss'?'1':'✓'} 치실${state.active&&!state.active.floss?' 생략':''}</li><li class="${step==='brush'||step==='ready'?'current':''}">2 칫솔질</li><li>3 보상</li></ol>`;}
 function teethGuide(quadrant=0){return `<svg viewBox="0 0 240 150" class="teeth" role="img" aria-label="현재 닦을 치아 구역"><text x="24" y="15">내 오른쪽</text><text x="164" y="15">내 왼쪽</text>${[0,1,2,3].map(q=>{let upper=q<2,left=q===0||q===3;return `<g class="${q===quadrant?'highlight':''}">${Array.from({length:5},(_,i)=>{const x=left?42+i*14:198-i*14;const y=upper?65-i*6:95+i*6;return `<rect x="${x-9}" y="${y-12}" width="18" height="24" rx="7"/>`;}).join('')}</g>`;}).join('')}<text x="111" y="71">위</text><text x="105" y="104">아래</text></svg>`;}
@@ -93,6 +97,7 @@ let busy=false;
 async function action(action){const [type,param]=action.split(':');
  if(type==='reload'){location.reload();return;}
  if(saveFailed)return;
+ if(type==='check-update'){await updater?.check();return;}
  if(type==='dialog-cancel'){closeDialog();if(screen==='session')render();return;}
  if(type==='setup-done'){setupRecovery='';parentUnlocked=false;closeDialog();showScreen('home');return;}
  if(!state.auth)return;
@@ -146,7 +151,13 @@ setInterval(()=>{
 async function prepareOffline(){
  if(!('serviceWorker'in navigator)||!window.isSecureContext)return;
  const timeout=setTimeout(()=>{if(!offlineReady)document.querySelectorAll('.offline-state').forEach(el=>el.textContent='오프라인 준비 미완료 · 인터넷 연결 후 다시 열어주세요');},45000);
- try{const reg=await navigator.serviceWorker.register('./sw.js',{scope:'./'});await navigator.serviceWorker.ready;clearTimeout(timeout);const worker=reg.active;if(worker){const channel=new MessageChannel();channel.port1.onmessage=e=>{offlineReady=e.data?.ready===true;document.querySelectorAll('.offline-state').forEach(el=>el.textContent=offlineReady?'오프라인 준비 완료':'오프라인 준비 미완료');};worker.postMessage({type:'CHECK_READY'},[channel.port2]);}navigator.storage?.persist?.().catch(()=>{});}catch{clearTimeout(timeout);document.querySelectorAll('.offline-state').forEach(el=>el.textContent='온라인 상태에서 다시 열어주세요');}
+ updater=new AppUpdater({sw:navigator.serviceWorker,window,document,
+  isIdle:()=>!running&&!editing&&!busy&&!saveFailed&&!document.hidden&&!dialog.open&&!document.activeElement?.closest('form'),
+  beforeReload:()=>persist(),
+  onStatus:text=>{updateStatus=text;document.querySelectorAll('.update-state').forEach(el=>el.textContent=text);},
+  onReady:ready=>{clearTimeout(timeout);offlineReady=ready;document.querySelectorAll('.offline-state').forEach(el=>el.textContent=ready?'오프라인 준비 완료':'오프라인 준비 미완료');}
+ });
+ try{await updater.start();navigator.storage?.persist?.().catch(()=>{});}catch{clearTimeout(timeout);updateStatus='인터넷 연결 후 업데이트를 다시 확인해주세요';document.querySelectorAll('.update-state').forEach(el=>el.textContent=updateStatus);}
 }
-async function boot(){try{await openDB();const saved=await readState();state=migrateState(saved||defaultState());revision=state.revision||0;if(saved?.schema===2&&saved.rooms===undefined)throw new Error('공간 정보를 확인해주세요.');if(saved)await persist();render();prepareOffline();}catch(e){app.innerHTML=`${header('기록 저장소를 열지 못했어요')}<main><section class="paper"><h2>단말 저장이 필요합니다.</h2><p>Safari의 일반 탭에서 HTTPS 앱 주소를 열어주세요. 비공개 브라우징이나 저장 공간 제한을 확인해주세요.</p><p class="error">${esc(e.message)}</p>${button('다시 시도','reload')}</section></main>`;}}
+async function boot(){try{await openDB();const saved=await readState();state=migrateState(saved||defaultState());revision=state.revision||0;if(saved?.schema===2&&saved.rooms===undefined)throw new Error('공간 정보를 확인해주세요.');if(saved)await persist();render();prepareOffline();}catch(e){app.innerHTML=`${header('기록 저장소를 열지 못했어요')}<main><section class="paper"><h2>단말 저장이 필요합니다.</h2><p>Chrome 또는 Safari의 일반 탭에서 HTTPS 앱 주소를 열어주세요. 비공개 브라우징이나 저장 공간 제한을 확인해주세요.</p><p class="error">${esc(e.message)}</p>${button('다시 시도','reload')}</section></main>`;}}
 boot();
