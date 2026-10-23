@@ -25,3 +25,8 @@ export function restoreCloud(data,auth){
 }
 export function profileKey(uid,pid){return `profile:${uid}:${pid}`;}
 export function hasProgress(s){return !!(s&&(s.history.length||s.active||s.coins||s.owned.length>2||s.worldsOwned.length>1));}
+
+// Whole-record arbitration: never add currency or union purchases from competing devices.
+export const canonical=value=>JSON.stringify(value,(_key,v)=>v&&typeof v==='object'&&!Array.isArray(v)?Object.fromEntries(Object.keys(v).sort().map(k=>[k,v[k]])):v);
+export function progressMs(s){return Math.max(s?.brushTotalMs||0,(s?.history||[]).reduce((n,h)=>n+(Number(h.duration)||0)*1000,0))+(s?.active?.elapsedMs||0);}
+export function compareProgress(a,b){return progressMs(a)-progressMs(b)||(a?.modifiedAt||0)-(b?.modifiedAt||0);}

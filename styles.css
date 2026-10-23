@@ -72,3 +72,5 @@
 @media(max-width:600px){.lock svg{width:21px;height:21px}.account-card h2{font-size:19px}}
 
 .update-state{display:block;margin-top:5px;font-size:12px}.update-check{font-size:12px;padding:4px 6px}.app-version{font-size:12px}
+
+.profile-entry{display:flex;flex-direction:column;gap:.4rem}.profile-entry .profile-choice{width:100%;flex:1}.delete-profile{font-size:.85rem;align-self:center;color:#8b493d}

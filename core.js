@@ -21,7 +21,7 @@ export const SLOT_NAMES={morning:'아침',noon:'점심',evening:'저녁'};
 function emptyRoom(){return {placements:Object.fromEntries(SLOTS.map(s=>[s,null])),damage:Object.fromEntries(SLOTS.map(s=>[s,0]))};}
 export function defaultState(){
  const room=emptyRoom();room.placements.left='olive';room.placements.center='athena';
- return {schema:2,revision:0,auth:null,settings:{...DEFAULTS},coins:0,owned:['olive','athena'],worldsOwned:['garden'],currentWorld:'garden',rooms:{garden:room},placements:room.placements,damage:room.damage,history:[],active:null,decorationMs:0,completed:0,attackCount:0};
+ return {schema:2,revision:0,auth:null,settings:{...DEFAULTS},coins:0,owned:['olive','athena'],worldsOwned:['garden'],currentWorld:'garden',rooms:{garden:room},placements:room.placements,damage:room.damage,history:[],active:null,decorationMs:0,completed:0,attackCount:0,brushTotalMs:0,modifiedAt:0};
 }
 // Keep legacy current-room aliases for existing UI/session code and older save migration.
 export function migrateState(state){
@@ -31,6 +31,8 @@ export function migrateState(state){
   state.worldsOwned=['garden'];state.currentWorld='garden';state.rooms={garden:room};state.schema=2;
  }
  if(!state.worldsOwned?.includes(state.currentWorld)||!state.rooms?.[state.currentWorld])throw new Error('공간 저장 정보를 읽지 못했습니다.');
+ state.brushTotalMs=Math.max(Number(state.brushTotalMs)||0,historyBrushMs(state));
+ state.modifiedAt=Number.isSafeInteger(state.modifiedAt)?state.modifiedAt:0;
  const room=state.rooms[state.currentWorld];state.placements=room.placements;state.damage=room.damage;return state;
 }
 export function visitWorld(state,id){
@@ -67,6 +69,7 @@ export function guideFor(elapsedMs,targetMs,type='electric'){
  const next=surface==='바깥면'?'다음은 안쪽면이에요.':surface==='안쪽면'?'앞니 안쪽과 맨 뒤 치아도 챙겨요.':quadrant<3?`다음은 ${AREAS[quadrant+1]}예요.`:'이제 마무리할 시간이에요.';
  return {quadrant,surface,detail,next,label:`${AREAS[quadrant]} · ${surface}`,key:`${quadrant}-${surface}`};
 }
+export function historyBrushMs(state){return (state.history||[]).reduce((sum,h)=>sum+Math.max(0,Number(h.duration)||0)*1000,0);}
 export function recordCompleted(state){
  const a=state.active;if(!a)throw new Error('진행 중인 모험이 없습니다.');
  if(a.brush&&a.elapsedMs<a.targetMs)throw new Error('아직 양치 시간이 남았어요.');
@@ -77,6 +80,7 @@ export function recordCompleted(state){
  state.coins+=reward;
  if(reward){state.completed++;state.decorationMs=state.settings.decorateSeconds*1000;}
  const result={id:a.id,day:a.day,slot:a.slot,status:'complete',brush:a.brush,floss:a.flossDone,duration:Math.round(a.elapsedMs/1000),reward};
+ state.brushTotalMs=Math.max(state.brushTotalMs||0,historyBrushMs(state))+Math.round(a.elapsedMs);
  state.history.push(result);state.history=state.history.slice(-1000);state.active=null;return result;
 }
 export function endEarly(state){
@@ -90,6 +94,7 @@ export function endEarly(state){
   if(hit)state.damage[hit]++;
  }
  const result={id:a.id,day:a.day,slot:a.slot,status:'ended',attack,hit,brush:false,floss:a.flossDone,reward:0,duration:Math.round(a.elapsedMs/1000)};
+ state.brushTotalMs=Math.max(state.brushTotalMs||0,historyBrushMs(state))+Math.round(a.elapsedMs);
  state.history.push(result);state.history=state.history.slice(-1000);state.active=null;return result;
 }
 export function repair(state,slot){if(!state.decorationMs)throw new Error('꾸미기 시간이 끝났어요.');if(!Object.hasOwn(state.damage,slot)||!state.damage[slot])throw new Error('수리할 곳이 없어요.');if(state.coins<4)throw new Error('신성한 빛이 4개 필요해요.');state.coins-=4;state.damage[slot]--;}
@@ -128,5 +133,7 @@ export function validateBackup(data){
  fresh.currentWorld=current;fresh.placements=fresh.rooms[current].placements;fresh.damage=fresh.rooms[current].damage;
  if(!Array.isArray(data.history)||data.history.length>1000)throw new Error('기록이 올바르지 않습니다.');
  fresh.history=data.history.map(h=>{if(!h||!/^\d{4}-\d{2}-\d{2}$/.test(h.day)||!Object.hasOwn(SLOT_NAMES,h.slot)||!['complete','ended'].includes(h.status))throw new Error('기록 형식이 올바르지 않습니다.');return {id:String(h.id).slice(0,80),day:h.day,slot:h.slot,status:h.status,brush:!!h.brush,floss:!!h.floss,reward:clampInt(h.reward,0,20),duration:clampInt(h.duration,0,600),attack:!!h.attack,hit:SLOTS.includes(h.hit)?h.hit:null};});
- fresh.decorationMs=clampInt(data.decorationMs,0,fresh.settings.decorateSeconds*1000);fresh.completed=clampInt(data.completed,0,1e7);fresh.attackCount=clampInt(data.attackCount,0,1e7);return fresh;
+ fresh.decorationMs=clampInt(data.decorationMs,0,fresh.settings.decorateSeconds*1000);fresh.completed=clampInt(data.completed,0,1e7);fresh.attackCount=clampInt(data.attackCount,0,1e7);
+ for(const k of ['brushTotalMs','modifiedAt'])if(data[k]!=null&&(!Number.isSafeInteger(data[k])||data[k]<0))throw new Error('동기화 기록이 올바르지 않습니다.');
+ fresh.brushTotalMs=Math.max(data.brushTotalMs||0,historyBrushMs(fresh));fresh.modifiedAt=data.modifiedAt||0;return fresh;
 }

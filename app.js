@@ -5,8 +5,9 @@ import {openDB,readState,writeState,createAuth,verifyPassword} from './db.js';
 import {CameraGuide} from './camera.js';
 import {Account} from './account.js';
 import {AppUpdater} from './app-update.js';
+import {progressMs} from './cloud-state.js';
 import {APP_VERSION} from './version.js';
-let updater,updateStatus='';
+let updater,updateStatus='',syncApplying=false;
 const app=document.querySelector('#app'),dialog=document.querySelector('#dialog');
 let state,revision=0,saveChain=Promise.resolve(),saveFailed=false,screen='home',running=false,lastTick=0,lastSaved=0,cam=null,parentUnlocked=false,editing=false,selected='olive',lastResult=null,lastGuide='',itemFilter='all',collectionTab='worlds',offlineReady=false,setupRecovery='',wakeLock=null,spokenAt=0;
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -19,11 +20,20 @@ const account=new Account({
  getState:()=>state,
  pauseAndSave:async()=>{if(state){pause();await saveChain;}},
  waitForSave:()=>saveChain,
- isIdle:()=>!running&&!editing&&!busy&&!saveFailed&&!document.hidden,
+ isIdle:()=>!busy&&!syncApplying&&!saveFailed&&!document.hidden&&!dialog.open&&!document.activeElement?.closest('form'),
+ commitRemote:async(next,expected,key,meta,guard)=>{
+  syncApplying=true;
+  const commit=saveChain.then(async()=>{if(!guard()||account.key!==key||revision!==expected||progressMs(state)>progressMs(next))return false;
+   next.revision=await writeState(next,expected,key,meta);
+   if(!guard()||account.key!==key)return false;
+   releaseWake();await account.applyState(next);toast('더 진행된 계정 기록으로 자동 동기화했어요.');return true;
+  });
+  saveChain=commit.catch(()=>false);try{return await commit;}finally{syncApplying=false;lastTick=performance.now();}
+ },
  applyState:async(next)=>{state=next;revision=next.revision||0;running=false;editing=false;parentUnlocked=false;if(screen==='session')screen='home';render();},
  openAccount:()=>{screen='account';render();},
  openHome:()=>{screen='home';render();},
- changed:(statusOnly=false)=>{if(!state)return;document.querySelectorAll('.cloud-state').forEach(el=>el.textContent=account.status());if((screen==='account'&&!(statusOnly&&document.activeElement?.closest('#profile-form')))||!account.ready)render();},
+ changed:(statusOnly=false)=>{if(!state)return;document.querySelectorAll('.cloud-state').forEach(el=>el.textContent=account.status());if((screen==='account'&&!(statusOnly&&document.activeElement?.closest('form')))||!account.ready)render();},
  download
 });
 function settingsIcon(){return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.7"/>${Array.from({length:8},(_,i)=>`<path d="M12 2v3" transform="rotate(${i*45} 12 12)"/>`).join('')}</svg>`;}
@@ -97,7 +107,7 @@ function renderSettings(){const s=state.settings;app.innerHTML=frame(`<div class
  document.querySelector('#settings-form').onsubmit=async e=>{e.preventDefault();if(!parentUnlocked)return;const d=new FormData(e.currentTarget);state.settings=normalizeSettings({...Object.fromEntries(d),voice:d.has('voice'),camera:d.has('camera')});state.decorationMs=Math.min(state.decorationMs,state.settings.decorateSeconds*1000);if(await persist()){toast('설정을 저장했어요.');showScreen('home');}};
  document.querySelector('#import-file').onchange=importBackup;
 }
-function renderHelp(){app.innerHTML=frame(`<section class="paper help"><span class="section-kicker">HOW TO PLAY</span><h2>하루 두 번, 작은 모험</h2><ol><li>아이패드를 세로로 세우고 치실과 칫솔을 준비해요.</li><li>치실은 서두르지 않고 여섯 구역을 차례로 마쳐요.</li><li>양치 시작을 누른 다음, 표시된 면을 따라 닦아요.</li><li>끝나면 신성한 빛을 받아 보물을 놓거나 새로운 공간을 열어요. 수집함에서 9개 공간과 57개 보물을 둘러볼 수 있어요.</li></ol><h3>티탄은 언제 오나요?</h3><p>양치를 시작한 뒤 ‘조기 종료’를 확정하면 한 번 공격해요. 앱을 안 쓴 날, 전화나 화면 전환, 인식 오류에는 공격하지 않아요.</p><h3>홈 화면에 설치하기</h3><p>안드로이드는 Chrome 메뉴 → 홈 화면에 추가, 아이패드는 Safari 공유 → 홈 화면에 추가를 선택하세요. ‘오프라인 준비 완료’가 표시된 다음에는 인터넷 없이 실행할 수 있어요.</p><h3>새 버전으로 업데이트하기</h3><p>인터넷에 연결되어 있으면 실행할 때와 다시 돌아올 때 새 버전을 확인해요. 양치·꾸미기를 마치면 기록을 저장한 뒤 새 버전을 열어요. 하단의 업데이트 확인 버튼으로 직접 확인할 수도 있어요. 기록을 지우거나 앱을 재설치할 필요는 없어요.</p><h3>카메라와 음성</h3><p>영상은 기기 안에서 얼굴 위치를 찾는 데만 쓰고 저장하지 않아요. 치아 청결도·압력·치실 정확도를 판정하지 않습니다. 마이크는 사용하지 않아요.</p><p>한국어 음성이 들리지 않으면 기기 설정에서 한국어 음성을 내려받아주세요. 화면 안내는 항상 제공됩니다.</p><h3>기록을 안전하게 보관하려면</h3><p>구글 로그인 후 같은 가족 프로필을 선택하면 기록을 이어서 사용할 수 있어요. 로그인 전 기기 기록은 계정 화면에서 옮길 수 있고, 부모 설정에서 백업 파일도 저장할 수 있어요. 브라우저 데이터 삭제나 저장공간 정리로 기록이 지워질 수 있습니다.</p>${button('돌아가기','home')}</section>`,null);}
+function renderHelp(){app.innerHTML=frame(`<section class="paper help"><span class="section-kicker">HOW TO PLAY</span><h2>하루 두 번, 작은 모험</h2><ol><li>아이패드를 세로로 세우고 치실과 칫솔을 준비해요.</li><li>치실은 서두르지 않고 여섯 구역을 차례로 마쳐요.</li><li>양치 시작을 누른 다음, 표시된 면을 따라 닦아요.</li><li>끝나면 신성한 빛을 받아 보물을 놓거나 새로운 공간을 열어요. 수집함에서 9개 공간과 57개 보물을 둘러볼 수 있어요.</li></ol><h3>티탄은 언제 오나요?</h3><p>양치를 시작한 뒤 ‘조기 종료’를 확정하면 한 번 공격해요. 앱을 안 쓴 날, 전화나 화면 전환, 인식 오류에는 공격하지 않아요.</p><h3>홈 화면에 설치하기</h3><p>안드로이드는 Chrome 메뉴 → 홈 화면에 추가, 아이패드는 Safari 공유 → 홈 화면에 추가를 선택하세요. ‘오프라인 준비 완료’가 표시된 다음에는 인터넷 없이 실행할 수 있어요.</p><h3>새 버전으로 업데이트하기</h3><p>인터넷에 연결되어 있으면 실행할 때와 다시 돌아올 때 새 버전을 확인해요. 양치·꾸미기를 마치면 기록을 저장한 뒤 새 버전을 열어요. 하단의 업데이트 확인 버튼으로 직접 확인할 수도 있어요. 기록을 지우거나 앱을 재설치할 필요는 없어요.</p><h3>카메라와 음성</h3><p>영상은 기기 안에서 얼굴 위치를 찾는 데만 쓰고 저장하지 않아요. 치아 청결도·압력·치실 정확도를 판정하지 않습니다. 마이크는 사용하지 않아요.</p><p>한국어 음성이 들리지 않으면 기기 설정에서 한국어 음성을 내려받아주세요. 화면 안내는 항상 제공됩니다.</p><h3>기록을 안전하게 보관하려면</h3><p>구글 로그인 후 같은 가족 프로필을 선택하면 기록을 이어서 사용할 수 있어요. 로그인 전 기기 기록은 처음 연결할 때 자동 비교해 옮긴 뒤 정리하며, 부모 설정에서 백업 파일도 저장할 수 있어요. 브라우저 데이터 삭제나 저장공간 정리로 기록이 지워질 수 있습니다.</p>${button('돌아가기','home')}</section>`,null);}
 function parentLogin(recovery=false){running=false;editing=false;releaseWake();persist();showDialog(recovery?'복구 코드 입력':'부모 비밀번호',`<p>${recovery?'처음 보관한 복구 코드를 입력해주세요.':'설정을 바꾸려면 비밀번호가 필요해요.'}</p><form id="login-form"><label>${recovery?'복구 코드':'비밀번호'}<input name="password" type="${recovery?'text':'password'}" autocomplete="${recovery?'off':'current-password'}" required></label><p id="login-error" class="error" role="alert"></p><button class="primary" type="submit">확인</button></form><div class="button-row">${button('취소','dialog-cancel','text')}${recovery?'':button('비밀번호를 잊었어요','recover','text')}</div>`);
  document.querySelector('#login-form').onsubmit=async e=>{e.preventDefault();const auth=state.auth,err=document.querySelector('#login-error'),btn=e.currentTarget.querySelector('button');if(Date.now()<auth.lockedUntil){err.textContent='잠시 후 다시 시도해주세요.';return;}btn.disabled=true;const valid=await verifyPassword(auth,e.currentTarget.password.value,recovery);if(!dialog.open)return;if(valid){auth.failures=0;auth.lockedUntil=0;await persist();parentUnlocked=true;closeDialog();if(recovery)passwordChange();else showScreen('settings');}else{auth.failures=(auth.failures||0)+1;if(auth.failures>=5){auth.lockedUntil=Date.now()+30000;auth.failures=0;}await persist();err.textContent=recovery?'복구 코드가 맞지 않습니다.':'비밀번호가 맞지 않습니다.';btn.disabled=false;}};
 }
@@ -111,7 +121,7 @@ function updateTimer(){const a=state.active;if(!a||screen!=='session'||a.stage!=
 let busy=false;
 async function action(action){const [type,param]=action.split(':');
  if(type==='reload'){location.reload();return;}
- if(saveFailed||account.loading||!account.ready)return;
+ if(saveFailed||syncApplying||account.loading||!account.ready)return;
  if(type==='dialog-cancel'){closeDialog();if(screen==='session')render();return;}
  if(type==='setup-done'){setupRecovery='';parentUnlocked=false;closeDialog();showScreen('home');return;}
  if(type==='check-update'){await updater?.check();return;}
@@ -153,7 +163,7 @@ dialog.addEventListener('cancel',e=>{e.preventDefault();if(setupRecovery||saveFa
 document.addEventListener('visibilitychange',()=>{if(document.hidden){pause();cam?.stop();cam=null;parentUnlocked=false;if(dialog.open&&!setupRecovery&&!saveFailed)closeDialog();if(screen==='settings')screen='home';}else{lastTick=performance.now();render();}});
 window.addEventListener('pagehide',()=>{pause();cam?.stop();});
 setInterval(()=>{
- if(!state||document.hidden||saveFailed)return;const now=performance.now(),delta=lastTick?now-lastTick:0;lastTick=now;const dt=delta<=1800?delta:0;
+ if(!state||document.hidden||saveFailed||syncApplying||account.loading)return;const now=performance.now(),delta=lastTick?now-lastTick:0;lastTick=now;const dt=delta<=1800?delta:0;
  if(screen==='session'&&state.active?.stage==='brush')updatePauseNote();
  if(running&&screen==='session'&&state.active?.stage==='brush'&&(!state.settings.camera||cam?.hasFace(now))){
   state.active.elapsedMs=Math.min(state.active.targetMs,state.active.elapsedMs+dt);updateTimer();if(state.active.elapsedMs>=state.active.targetMs){finish();return;}
@@ -176,5 +186,5 @@ async function prepareOffline(){
  });
  try{await updater.start();navigator.storage?.persist?.().catch(()=>{});}catch{clearTimeout(timeout);updateStatus='인터넷 연결 후 업데이트를 다시 확인해주세요';document.querySelectorAll('.update-state').forEach(el=>el.textContent=updateStatus);}
 }
-async function boot(){try{await openDB();const saved=await readState();state=migrateState(saved||defaultState());revision=state.revision||0;if(saved?.schema===2&&saved.rooms===undefined)throw new Error('공간 정보를 확인해주세요.');if(saved)await persist();render();prepareOffline();await account.init();render();}catch(e){app.innerHTML=`${header('기록 저장소를 열지 못했어요')}<main><section class="paper"><h2>단말 저장이 필요합니다.</h2><p>Chrome 또는 Safari의 일반 탭에서 HTTPS 앱 주소를 열어주세요. 비공개 브라우징이나 저장 공간 제한을 확인해주세요.</p><p class="error">${esc(e.message)}</p>${button('다시 시도','reload')}</section></main>`;}}
+async function boot(){try{await openDB();const saved=await readState();state=migrateState(saved||defaultState());state.auth??=(await readState('device'))?.auth??null;revision=state.revision||0;if(saved?.schema===2&&saved.rooms===undefined)throw new Error('공간 정보를 확인해주세요.');if(saved)await persist();render();prepareOffline();await account.init();render();}catch(e){app.innerHTML=`${header('기록 저장소를 열지 못했어요')}<main><section class="paper"><h2>단말 저장이 필요합니다.</h2><p>Chrome 또는 Safari의 일반 탭에서 HTTPS 앱 주소를 열어주세요. 비공개 브라우징이나 저장 공간 제한을 확인해주세요.</p><p class="error">${esc(e.message)}</p>${button('다시 시도','reload')}</section></main>`;}}
 boot();
