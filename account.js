@@ -40,11 +40,11 @@ export class Account{
   this.profiles=[];
   if(uid){
    await this.refreshProfiles();if(epoch!==this.epoch)return;
-   const selected=this.profiles.find(p=>p.id===saved(`selected:${uid}`,null))||this.profiles.find(p=>p.preferred);
+   const selected=this.profiles.find(p=>p.id===saved(`selected:${uid}`,null))||this.profiles.find(p=>p.preferred)||this.profiles[0];
    if(selected)try{await this.select(selected.id);}catch(error){this.message=cloudError(error);}
    if(!this.profile)this.openAccount();
   }
-  }finally{if(epoch===this.epoch){this.loading=false;this.changed();}}
+  }finally{if(epoch===this.epoch){this.loading=false;if(this.profile)this.openHome?.();this.changed();}}
  }
  async refreshProfiles(){
   const uid=this.uid,epoch=this.epoch;if(!uid)return;
@@ -78,8 +78,8 @@ export class Account{
    onState:async next=>{if(this.key===key&&epoch===this.epoch)await this.applyState(next,key);},onStatus:()=>this.changed(true)});
   await this.applyState(migrateState(local),key);
   this.guestHasProgress=hasProgress(await readState());
-  this.confirmImport=false;this.openAccount();this.schedule();
-  }finally{if(epoch===this.epoch){this.loading=wasLoading;this.changed();}}
+  this.confirmImport=false;this.schedule();
+  }finally{if(epoch===this.epoch){this.loading=wasLoading;if(!this.loading)this.openHome?.();this.changed();}}
  }
  schedule(){clearTimeout(this.timer);this.timer=setTimeout(()=>this.flush(),800);}
  async flush(){if(this.sync&&this.ready&&!this.loading&&this.isIdle()){await this.waitForSave();await this.sync.flush();}}

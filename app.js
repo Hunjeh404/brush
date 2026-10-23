@@ -22,6 +22,7 @@ const account=new Account({
  isIdle:()=>!running&&!editing&&!busy&&!saveFailed&&!document.hidden,
  applyState:async(next)=>{state=next;revision=next.revision||0;running=false;editing=false;parentUnlocked=false;if(screen==='session')screen='home';render();},
  openAccount:()=>{screen='account';render();},
+ openHome:()=>{screen='home';render();},
  changed:(statusOnly=false)=>{if(!state)return;document.querySelectorAll('.cloud-state').forEach(el=>el.textContent=account.status());if((screen==='account'&&!(statusOnly&&document.activeElement?.closest('#profile-form')))||!account.ready)render();},
  download
 });
@@ -103,33 +104,7 @@ function parentLogin(recovery=false){running=false;editing=false;releaseWake();p
 function passwordChange(){if(!parentUnlocked)return;showDialog('새 비밀번호 설정',`<form id="password-form"><label>새 비밀번호 (6자 이상)<input name="password" type="password" minlength="6" maxlength="64" required autocomplete="new-password"></label><label>다시 입력<input name="confirm" type="password" minlength="6" maxlength="64" required autocomplete="new-password"></label><p id="password-error" class="error"></p><button type="submit" class="primary">변경하기</button></form>${button('취소','dialog-cancel','text')}`);document.querySelector('#password-form').onsubmit=async e=>{e.preventDefault();if(!parentUnlocked)return;const f=e.currentTarget;if(f.password.value!==f.confirm.value){document.querySelector('#password-error').textContent='두 비밀번호가 달라요.';return;}f.querySelector('button').disabled=true;const {auth,recovery}=await createAuth(f.password.value);if(!parentUnlocked)return;state.auth=auth;setupRecovery=recovery;if(await persist()){parentUnlocked=false;showRecovery();}};}
 function download(name,data){const u=URL.createObjectURL(new Blob([data],{type:'application/json'})),a=document.createElement('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),10000);}
 async function importBackup(e){if(!parentUnlocked)return;const file=e.target.files?.[0];if(!file)return;if(file.size>1000000){toast('백업 파일이 너무 큽니다.');return;}try{const recovered=validateBackup(JSON.parse(await file.text()));if(!parentUnlocked)return;showDialog('기록을 복원할까요?',`<p>현재 정원과 기록을 선택한 백업으로 교체합니다. 비밀번호는 유지됩니다.</p><div class="button-row"><button id="restore-confirm" class="primary">복원</button>${button('취소','dialog-cancel','soft')}</div>`);document.querySelector('#restore-confirm').onclick=async()=>{if(!parentUnlocked)return;const auth=state.auth;state={...recovered,auth};closeDialog();if(await persist()){toast('백업을 복원했어요.');showScreen('settings');}};}catch(e){toast(e.message);}}
-function pauseNote(){return !running?'일시정지 중 · 준비되면 이어서 시작해요.':!state.settings.camera?'카메라 없이 타이머로 진행 중이에요.':cam?.hasFace()?'얼굴이 보여요 · 얼굴이 사라지면 시간이 멈춰요.':'얼굴 확인 중 · 시간이 멈춰 있어요. 얼굴이 보이면 자동으로 이어져요.';}
-function updatePauseNote(){const el=document.querySelector('#pause-note');if(el){const note=pauseNote();if(el.textContent!==note)el.textContent=note;}}
-function pause(){running=false;editing=false;releaseWake();stopSpeech();persist();}
-function updateTimer(){const a=state.active;if(!a||screen!=='session'||a.stage!=='brush')return;const el=document.querySelector('#remaining');if(!el)return;el.textContent=time(a.targetMs-a.elapsedMs);const pct=Math.min(100,a.elapsedMs/a.targetMs*100);document.querySelector('#progress-fill').style.width=pct+'%';document.querySelector('.track').setAttribute('aria-valuenow',Math.floor(pct));const g=guideFor(a.elapsedMs,a.targetMs,a.brushType);if(g.key!==lastGuide){lastGuide=g.key;document.querySelector('#guide-label').textContent=g.label;document.querySelector('#guide-next').textContent=g.next;document.querySelector('#teeth-guide').innerHTML=teethGuide(g.quadrant);document.querySelector('.coach-text').textContent=g.detail;document.querySelectorAll('.quadrants span').forEach((e,i)=>e.classList.toggle('done',i<=g.quadrant));if(running)speak(`${g.label}. ${g.detail}`);}}
-let busy=false;
-async function action(action){const [type,param]=action.split(':');
- if(type==='reload'){location.reload();return;}
- if(saveFailed||account.loading||!account.ready)return;
- if(type==='dialog-cancel'){closeDialog();if(screen==='session')render();return;}
- if(type==='setup-done'){setupRecovery='';parentUnlocked=false;closeDialog();showScreen('home');return;}
- if(type==='check-update'){await updater?.check();return;}
- if(action==='account'){pause();await saveChain;showScreen('account');return;}
- if(action.startsWith('account:')){await account.action(action.slice(8));return;}
- if(!state.auth)return;
- switch(type){
- case 'home':case 'garden':case 'collection':case 'help':pause();showScreen(type);break;
- case 'worlds':pause();collectionTab='worlds';showScreen('collection');break;
- case 'collection-tab':collectionTab=param==='items'?'items':'worlds';render();break;
- case 'preview-world':previewWorld(param);break;
- case 'unlock-world':unlockWorld(state,param);closeDialog();editing=false;releaseWake();await persist();showScreen('garden');toast('새로운 공간을 열었어요. 꾸미기 시작을 눌러 보물을 놓아보세요.');break;
- case 'visit':visitWorld(state,param);closeDialog();await persist();showScreen('garden');break;
- case 'remove':if(editing){removePlaced(state,param);await persist();render();toast('보관함에 넣었어요.');}break;
- case 'parent':parentLogin();break;
- case 'recover':parentLogin(true);break;
- case 'start':startSession(state,param);await persist();showScreen('session');break;
- case 'resume':running=false;showScreen('session');break;
- case 'floss-next':advanceFloss(state);await persist();if(state.active.stage==='complete')await finish();else render();break;
+function pauseNote(){return !running?'일시정지 중 · 준비되면 이어서 시작해요.':!state.settings.camera?'카메라 없이 타이머로 진행 중이에요.':cam?.hasFace()?'얼굴이 보여요 · 얼굴이 사라…772 tokens truncated…se 'floss-next':advanceFloss(state);await persist();if(state.active.stage==='complete')await finish();else render();break;
  case 'exit-floss':showDialog('치실 안내를 나갈까요?',`<p>아직 칫솔질을 시작하지 않아 티탄은 오지 않아요.</p>${button('계속하기','dialog-cancel')}${button('나가기','confirm-early','soft')}`);break;
  case 'brush-start':state.active.stage='brush';state.active.started=true;running=true;lastTick=performance.now();lastGuide='';await persist();keepAwake();render();break;
  case 'pause':if(running){pause();}else{running=true;lastTick=performance.now();keepAwake();}render();break;

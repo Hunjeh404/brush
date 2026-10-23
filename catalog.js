@@ -69,7 +69,7 @@ export const EXTRA_ITEMS = [
     "id": "sea-1",
     "name": "산호 삼지창",
     "file": "treasures/sea-1.webp",
-    "cost": 40,
+    "cost": 20,
     "kind": "garden",
     "theme": "sea"
   },
@@ -77,7 +77,7 @@ export const EXTRA_ITEMS = [
     "id": "sea-2",
     "name": "조개 분수",
     "file": "treasures/sea-2.webp",
-    "cost": 70,
+    "cost": 35,
     "kind": "garden",
     "theme": "sea"
   },
@@ -85,7 +85,7 @@ export const EXTRA_ITEMS = [
     "id": "sea-3",
     "name": "돌고래 조각",
     "file": "treasures/sea-3.webp",
-    "cost": 100,
+    "cost": 50,
     "kind": "garden",
     "theme": "sea"
   },
@@ -93,7 +93,7 @@ export const EXTRA_ITEMS = [
     "id": "sea-4",
     "name": "진주 보물함",
     "file": "treasures/sea-4.webp",
-    "cost": 140,
+    "cost": 70,
     "kind": "garden",
     "theme": "sea"
   },
@@ -101,7 +101,7 @@ export const EXTRA_ITEMS = [
     "id": "sea-5",
     "name": "산호 화병",
     "file": "treasures/sea-5.webp",
-    "cost": 180,
+    "cost": 90,
     "kind": "garden",
     "theme": "sea"
   },
@@ -109,7 +109,7 @@ export const EXTRA_ITEMS = [
     "id": "sea-6",
     "name": "바다의 벽화",
     "file": "treasures/sea-6.webp",
-    "cost": 220,
+    "cost": 110,
     "kind": "mural",
     "theme": "sea"
   },
@@ -117,7 +117,7 @@ export const EXTRA_ITEMS = [
     "id": "moon-1",
     "name": "은빛 활",
     "file": "treasures/moon-1.webp",
-    "cost": 40,
+    "cost": 20,
     "kind": "garden",
     "theme": "moon"
   },
@@ -125,7 +125,7 @@ export const EXTRA_ITEMS = [
     "id": "moon-2",
     "name": "달빛 사슴",
     "file": "treasures/moon-2.webp",
-    "cost": 70,
+    "cost": 35,
     "kind": "garden",
     "theme": "moon"
   },
@@ -133,7 +133,7 @@ export const EXTRA_ITEMS = [
     "id": "moon-3",
     "name": "초승달 나무",
     "file": "treasures/moon-3.webp",
-    "cost": 100,
+    "cost": 50,
     "kind": "garden",
     "theme": "moon"
   },
@@ -141,7 +141,7 @@ export const EXTRA_ITEMS = [
     "id": "moon-4",
     "name": "별꽃 화분",
     "file": "treasures/moon-4.webp",
-    "cost": 140,
+    "cost": 70,
     "kind": "garden",
     "theme": "moon"
   },
@@ -149,7 +149,7 @@ export const EXTRA_ITEMS = [
     "id": "moon-5",
     "name": "숲속 등불",
     "file": "treasures/moon-5.webp",
-    "cost": 180,
+    "cost": 90,
     "kind": "garden",
     "theme": "moon"
   },
@@ -157,7 +157,7 @@ export const EXTRA_ITEMS = [
     "id": "moon-6",
     "name": "달의 벽화",
     "file": "treasures/moon-6.webp",
-    "cost": 220,
+    "cost": 110,
     "kind": "mural",
     "theme": "moon"
   },
@@ -165,7 +165,7 @@ export const EXTRA_ITEMS = [
     "id": "sun-1",
     "name": "태양의 리라",
     "file": "treasures/sun-1.webp",
-    "cost": 40,
+    "cost": 20,
     "kind": "garden",
     "theme": "sun"
   },
@@ -173,7 +173,7 @@ export const EXTRA_ITEMS = [
     "id": "sun-2",
     "name": "월계관 받침",
     "file": "treasures/sun-2.webp",
-    "cost": 70,
+    "cost": 35,
     "kind": "garden",
     "theme": "sun"
   },
@@ -181,7 +181,7 @@ export const EXTRA_ITEMS = [
     "id": "sun-3",
     "name": "황금 백조",
     "file": "treasures/sun-3.webp",
-    "cost": 100,
+    "cost": 50,
     "kind": "garden",
     "theme": "sun"
   },
@@ -189,7 +189,7 @@ export const EXTRA_ITEMS = [
     "id": "sun-4",
     "name": "햇살 오르간",
     "file": "treasures/sun-4.webp",
-    "cost": 140,
+    "cost": 70,
     "kind": "garden",
     "theme": "sun"
   },
@@ -197,7 +197,7 @@ export const EXTRA_ITEMS = [
     "id": "sun-5",
     "name": "호박빛 등잔",
     "file": "treasures/sun-5.webp",
-    "cost": 180,
+    "cost": 90,
     "kind": "garden",
     "theme": "sun"
   },
@@ -205,7 +205,7 @@ export const EXTRA_ITEMS = [
     "id": "sun-6",
     "name": "태양의 벽화",
     "file": "treasures/sun-6.webp",
-    "cost": 220,
+    "cost": 110,
     "kind": "mural",
     "theme": "sun"
   },
@@ -213,7 +213,7 @@ export const EXTRA_ITEMS = [
     "id": "wisdom-1",
     "name": "지혜의 부엉이",
     "file": "treasures/wisdom-1.webp",
-    "cost": 40,
+    "cost": 20,
     "kind": "garden",
     "theme": "wisdom"
   },
@@ -221,7 +221,7 @@ export const EXTRA_ITEMS = [
     "id": "wisdom-2",
     "name": "두루마리 함",
     "file": "treasures/wisdom-2.webp",
-    "cost": 70,
+    "cost": 35,
     "kind": "garden",
     "theme": "wisdom"
   },
@@ -229,7 +229,7 @@ export const EXTRA_ITEMS = [
     "id": "wisdom-3",
     "name": "작은 책장",
     "file": "treasures/wisdom-3.webp",
-    "cost": 100,
+    "cost": 50,
     "kind": "garden",
     "theme": "wisdom"
   },
@@ -237,7 +237,7 @@ export const EXTRA_ITEMS = [
     "id": "wisdom-4",
     "name": "천구의",
     "file": "treasures/wisdom-4.webp",
-    "cost": 140,
+    "cost": 70,
     "kind": "garden",
     "theme": "wisdom"
   },
@@ -245,7 +245,7 @@ export const EXTRA_ITEMS = [
     "id": "wisdom-5",
     "name": "올리브 등잔",
     "file": "treasures/wisdom-5.webp",
-    "cost": 180,
+    "cost": 90,
     "kind": "garden",
     "theme": "wisdom"
   },
@@ -253,7 +253,7 @@ export const EXTRA_ITEMS = [
     "id": "wisdom-6",
     "name": "지혜의 벽화",
     "file": "treasures/wisdom-6.webp",
-    "cost": 220,
+    "cost": 110,
     "kind": "mural",
     "theme": "wisdom"
   },
@@ -261,7 +261,7 @@ export const EXTRA_ITEMS = [
     "id": "harvest-1",
     "name": "황금 밀 바구니",
     "file": "treasures/harvest-1.webp",
-    "cost": 40,
+    "cost": 20,
     "kind": "garden",
     "theme": "harvest"
   },
@@ -269,7 +269,7 @@ export const EXTRA_ITEMS = [
     "id": "harvest-2",
     "name": "꽃수레",
     "file": "treasures/harvest-2.webp",
-    "cost": 70,
+    "cost": 35,
     "kind": "garden",
     "theme": "harvest"
   },
@@ -277,7 +277,7 @@ export const EXTRA_ITEMS = [
     "id": "harvest-3",
     "name": "석류나무",
     "file": "treasures/harvest-3.webp",
-    "cost": 100,
+    "cost": 50,
     "kind": "garden",
     "theme": "harvest"
   },
@@ -285,7 +285,7 @@ export const EXTRA_ITEMS = [
     "id": "harvest-4",
     "name": "풍요의 뿔",
     "file": "treasures/harvest-4.webp",
-    "cost": 140,
+    "cost": 70,
     "kind": "garden",
     "theme": "harvest"
   },
@@ -293,7 +293,7 @@ export const EXTRA_ITEMS = [
     "id": "harvest-5",
     "name": "나비 분수",
     "file": "treasures/harvest-5.webp",
-    "cost": 180,
+    "cost": 90,
     "kind": "garden",
     "theme": "harvest"
   },
@@ -301,7 +301,7 @@ export const EXTRA_ITEMS = [
     "id": "harvest-6",
     "name": "풍요의 벽화",
     "file": "treasures/harvest-6.webp",
-    "cost": 220,
+    "cost": 110,
     "kind": "mural",
     "theme": "harvest"
   },
@@ -309,7 +309,7 @@ export const EXTRA_ITEMS = [
     "id": "forge-1",
     "name": "청동 모루",
     "file": "treasures/forge-1.webp",
-    "cost": 40,
+    "cost": 20,
     "kind": "garden",
     "theme": "forge"
   },
@@ -317,7 +317,7 @@ export const EXTRA_ITEMS = [
     "id": "forge-2",
     "name": "황금 자동인형",
     "file": "treasures/forge-2.webp",
-    "cost": 70,
+    "cost": 35,
     "kind": "garden",
     "theme": "forge"
   },
@@ -325,7 +325,7 @@ export const EXTRA_ITEMS = [
     "id": "forge-3",
     "name": "보석 화로",
     "file": "treasures/forge-3.webp",
-    "cost": 100,
+    "cost": 50,
     "kind": "garden",
     "theme": "forge"
   },
@@ -333,7 +333,7 @@ export const EXTRA_ITEMS = [
     "id": "forge-4",
     "name": "수정 망치",
     "file": "treasures/forge-4.webp",
-    "cost": 140,
+    "cost": 70,
     "kind": "garden",
     "theme": "forge"
   },
@@ -341,7 +341,7 @@ export const EXTRA_ITEMS = [
     "id": "forge-5",
     "name": "태엽 부엉이",
     "file": "treasures/forge-5.webp",
-    "cost": 180,
+    "cost": 90,
     "kind": "garden",
     "theme": "forge"
   },
@@ -349,7 +349,7 @@ export const EXTRA_ITEMS = [
     "id": "forge-6",
     "name": "불꽃의 벽화",
     "file": "treasures/forge-6.webp",
-    "cost": 220,
+    "cost": 110,
     "kind": "mural",
     "theme": "forge"
   },
@@ -357,7 +357,7 @@ export const EXTRA_ITEMS = [
     "id": "cloud-1",
     "name": "날개 신발",
     "file": "treasures/cloud-1.webp",
-    "cost": 40,
+    "cost": 20,
     "kind": "garden",
     "theme": "cloud"
   },
@@ -365,7 +365,7 @@ export const EXTRA_ITEMS = [
     "id": "cloud-2",
     "name": "여행자의 가방",
     "file": "treasures/cloud-2.webp",
-    "cost": 70,
+    "cost": 35,
     "kind": "garden",
     "theme": "cloud"
   },
@@ -373,7 +373,7 @@ export const EXTRA_ITEMS = [
     "id": "cloud-3",
     "name": "구름 표지석",
     "file": "treasures/cloud-3.webp",
-    "cost": 100,
+    "cost": 50,
     "kind": "garden",
     "theme": "cloud"
   },
@@ -381,7 +381,7 @@ export const EXTRA_ITEMS = [
     "id": "cloud-4",
     "name": "날개 우편함",
     "file": "treasures/cloud-4.webp",
-    "cost": 140,
+    "cost": 70,
     "kind": "garden",
     "theme": "cloud"
   },
@@ -389,7 +389,7 @@ export const EXTRA_ITEMS = [
     "id": "cloud-5",
     "name": "하늘 나침반",
     "file": "treasures/cloud-5.webp",
-    "cost": 180,
+    "cost": 90,
     "kind": "garden",
     "theme": "cloud"
   },
@@ -397,7 +397,7 @@ export const EXTRA_ITEMS = [
     "id": "cloud-6",
     "name": "여행의 벽화",
     "file": "treasures/cloud-6.webp",
-    "cost": 220,
+    "cost": 110,
     "kind": "mural",
     "theme": "cloud"
   },
@@ -405,7 +405,7 @@ export const EXTRA_ITEMS = [
     "id": "stars-1",
     "name": "별자리 지구본",
     "file": "treasures/stars-1.webp",
-    "cost": 40,
+    "cost": 20,
     "kind": "garden",
     "theme": "stars"
   },
@@ -413,7 +413,7 @@ export const EXTRA_ITEMS = [
     "id": "stars-2",
     "name": "천마 조각",
     "file": "treasures/stars-2.webp",
-    "cost": 70,
+    "cost": 35,
     "kind": "garden",
     "theme": "stars"
   },
@@ -421,7 +421,7 @@ export const EXTRA_ITEMS = [
     "id": "stars-3",
     "name": "은하수 등불",
     "file": "treasures/stars-3.webp",
-    "cost": 100,
+    "cost": 50,
     "kind": "garden",
     "theme": "stars"
   },
@@ -429,7 +429,7 @@ export const EXTRA_ITEMS = [
     "id": "stars-4",
     "name": "별빛 수정",
     "file": "treasures/stars-4.webp",
-    "cost": 140,
+    "cost": 70,
     "kind": "garden",
     "theme": "stars"
   },
@@ -437,7 +437,7 @@ export const EXTRA_ITEMS = [
     "id": "stars-5",
     "name": "초승달 의자",
     "file": "treasures/stars-5.webp",
-    "cost": 180,
+    "cost": 90,
     "kind": "garden",
     "theme": "stars"
   },
@@ -445,7 +445,7 @@ export const EXTRA_ITEMS = [
     "id": "stars-6",
     "name": "은하수 벽화",
     "file": "treasures/stars-6.webp",
-    "cost": 220,
+    "cost": 110,
     "kind": "mural",
     "theme": "stars"
   }

@@ -23,10 +23,10 @@ test('unlock requires earned time and funds; repeat visits never charge; each ro
  const s=defaultState();s.coins=1000;
  assert.throws(()=>unlockWorld(s,'cloud'));assert.equal(s.coins,1000);
  s.decorationMs=30000;unlockWorld(s,'cloud');assert.equal(s.coins,880);
- purchasePlace(s,'cloud-1','frontLeft');assert.equal(s.coins,840);
- purchasePlace(s,'cloud-6','center');assert.equal(s.coins,620);
+ purchasePlace(s,'cloud-1','frontLeft');assert.equal(s.coins,860);
+ purchasePlace(s,'cloud-6','center');assert.equal(s.coins,750);
  visitWorld(s,'garden');assert.equal(s.placements.left,'olive');assert.equal(s.placements.frontLeft,null);
- unlockWorld(s,'cloud');assert.equal(s.coins,620);assert.equal(s.placements.frontLeft,'cloud-1');assert.equal(s.placements.center,'cloud-6');
+ unlockWorld(s,'cloud');assert.equal(s.coins,750);assert.equal(s.placements.frontLeft,'cloud-1');assert.equal(s.placements.center,'cloud-6');
  const reloaded=migrateState(JSON.parse(JSON.stringify(s)));purchasePlace(reloaded,'olive','right');
  visitWorld(reloaded,'garden');visitWorld(reloaded,'cloud');assert.equal(reloaded.placements.right,'olive');
  reloaded.decorationMs=0;visitWorld(reloaded,'garden');assert.equal(reloaded.currentWorld,'garden');
@@ -57,3 +57,5 @@ test('an attack affects only the current space and is bounded at six positions',
  for(let i=0;i<23;i++){startSession(s,'morning');s.active.stage='brush';endEarly(s);}
  assert.ok(SLOTS.every(slot=>s.damage[slot]===3));visitWorld(s,'garden');assert.ok(SLOTS.every(slot=>s.damage[slot]===0));
 });
+
+test('all 48 added treasures cost half, while original decorations and space prices stay unchanged',()=>{for(const w of WORLDS.slice(1))assert.deepEqual(ITEMS.filter(i=>i.theme===w.id).map(i=>i.cost),[20,35,50,70,90,110]);assert.deepEqual(ITEMS.slice(0,9).map(i=>i.cost),[0,20,15,25,0,20,30,30,30]);assert.equal(WORLDS.find(w=>w.id==='cloud').cost,120);});
