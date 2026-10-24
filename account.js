@@ -1,5 +1,6 @@
 import {getCloudClient,apiFor,cloudError} from './cloud-client.js';
 import {CloudSync} from './cloud-sync.js';
+import {AUTH_REDIRECT_URL} from './cloud-config.js';
 import {defaultState,migrateState} from './core.js';
 import {profileKey,cloudPayload,restoreCloud,hasProgress,compareProgress} from './cloud-state.js';
 import {readState,writeState,clearImportedGuest,removeProfileCache} from './db.js';
@@ -130,7 +131,7 @@ export class Account{
   try{
    if(kind==='login'){
     await this.pauseAndSave();this.client??=await getCloudClient();this.api??=apiFor(this.client);
-    const redirectTo=new URL('./',location.href).href;
+    const redirectTo=AUTH_REDIRECT_URL;
     const {error}=await this.client.auth.signInWithOAuth({provider:'google',options:{redirectTo}});if(error)throw error;
    }else if(kind==='pick')await this.select(id);
    else if(kind==='refresh')await this.refreshProfiles();

@@ -53,3 +53,9 @@ test('two independent device caches converge on the longer active session withou
  await Promise.all([one.sync.flush(),two.sync.flush()]);await one.sync.flush();await two.sync.flush();assert.equal(progressMs(await readState(one.key)),120000);assert.equal(progressMs(await readState(two.key)),120000);assert.equal((await readState(one.key)).coins,20);assert.equal((await readState(two.key)).coins,20);
 });
 test('account without guest progress still continuously pulls server changes',async()=>{let version=1;const {sync,key}=await setup({load:async()=>({version:++version,payload:{...cloudPayload(defaultState()),coins:61,brushTotalMs:450000}})},false);await sync.flush();assert.equal((await readState(key)).coins,61);assert.equal((await readState(key))._cloud.dirty,false);});
+
+test('Google login always returns to the allowlisted Brush URL from shortcut and callback paths',async()=>{
+ const previous=globalThis.location;const calls=[];const a=new Account({pauseAndSave:async()=>{},changed:()=>{}});a.api={};a.client={auth:{signInWithOAuth:async options=>{calls.push(options);return {error:null};}}};
+ try{for(const href of ['https://hunjeh404.github.io/brush','https://hunjeh404.github.io/brush/','https://hunjeh404.github.io/brush/index.html?from=homescreen#account','https://hunjeh404.github.io/brush/?code=old-callback']){globalThis.location={href};await a.action('login');assert.deepEqual(calls.at(-1),{provider:'google',options:{redirectTo:'https://hunjeh404.github.io/brush/'}});}}finally{globalThis.location=previous;}
+ assert.equal(calls.length,4);
+});
