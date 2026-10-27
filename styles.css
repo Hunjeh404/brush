@@ -86,3 +86,55 @@
 .world-cloud{--mural-x:50.0000%;--mural-y:22.0994%;--mural-width:10.2210%;--mural-height:13.8122%;}
 .world-stars{--mural-x:50.0000%;--mural-y:19.3370%;--mural-width:12.5691%;--mural-height:16.2063%;}
 .garden-slot.center .scene-object,.garden-slot.center .scene-object.sprite{object-fit:cover;object-position:center}
+
+/* One comic raid per saved early exit; only the actual damaged slot reacts. */
+.titan-raid{--raid-time:5.2s;--hit-x:50%;--hit-y:48%;margin:0 0 24px;text-align:center}
+.raid-intro{font-weight:800;color:#77533c;font-size:clamp(16px,3vw,23px);margin-bottom:12px!important}
+.raid-stage{position:relative;isolation:isolate}
+.raid-stage .garden-scene{box-shadow:0 7px 20px #71523720}
+.raid-crew{position:absolute;z-index:4;left:clamp(32%,var(--hit-x),68%);top:clamp(16%,calc(var(--hit-y) - 12%),59%);width:66%;display:flex;align-items:flex-end;transform:translateX(-50%);pointer-events:none;opacity:0}
+.raid-titan{flex:0 0 33.333%;min-width:0;position:relative;transform-origin:50% 90%;filter:drop-shadow(0 3px 1px #4f3a2b33)}
+.raid-titan-0{--hair:#786447;--robe:#a78b9d;--arrival:0s;--swing:0s;z-index:2}
+.raid-titan-1{--hair:#725d47;--robe:#8cabb3;--arrival:.12s;--swing:.32s;z-index:1}
+.raid-titan-2{--hair:#aa9980;--robe:#c39073;--arrival:.24s;--swing:.64s;z-index:3}
+.raid-puppet{display:block;width:100%;height:auto;overflow:visible}
+.raid-hammer-arm{transform-origin:118px 104px}
+.raid-free-arm{transform-origin:55px 110px}
+.raid-speech{position:absolute;right:-2%;top:0;padding:5px 8px;border:2px solid #8d7353;border-radius:45% 45% 45% 8%;background:#fff9e8;color:#6e5540;font-size:clamp(10px,2vw,15px);font-weight:800;opacity:0;white-space:nowrap}
+.raid-impact{position:absolute;z-index:5;left:var(--hit-x);top:var(--hit-y);width:0;height:0;pointer-events:none}
+.raid-bonk{position:absolute;left:0;top:0;padding:5px 9px;font-family:system-ui,sans-serif;font-weight:900;font-size:clamp(19px,4.5vw,34px);line-height:1;color:#845534;text-shadow:2px 2px #fff7dd,-2px -2px #fff7dd;white-space:nowrap;opacity:0}
+.bonk-one{transform:translate(-75%,-120%) rotate(-13deg)}
+.bonk-two{transform:translate(-20%,-135%) rotate(10deg);color:#8d6745}
+.bonk-three{transform:translate(10%,-105%) rotate(-9deg);color:#727451}
+.raid-dust{position:absolute;width:clamp(72px,18vw,135px);max-width:none;height:auto;left:0;top:0;transform:translate(-50%,-25%);opacity:0}
+.raid-spark{position:absolute;left:0;top:0;color:#d2aa4c;text-shadow:0 1px #fff8d5;font-style:normal;font-size:clamp(14px,3vw,23px);opacity:0;--dx:0px;--dy:0px}
+.spark-0{--dx:-48px;--dy:-34px}.spark-1{--dx:40px;--dy:-30px}.spark-2{--dx:-33px;--dy:22px}.spark-3{--dx:43px;--dy:24px}.spark-4{--dx:0px;--dy:-50px}.spark-5{--dx:-55px;--dy:0px}.spark-6{--dx:53px;--dy:-3px}
+.raid-summary{font-size:13px;line-height:1.7;color:#827159;padding:0 8px;margin-top:12px!important}
+.raid-skip{font-size:12px;margin-top:3px}.raid-skip[hidden]{display:none}
+.titan-raid.is-playing .raid-crew{opacity:1}
+.titan-raid.is-playing .raid-titan{animation:raid-arrive-leave var(--raid-time) var(--arrival) both}
+.titan-raid.is-playing .raid-hammer-arm{animation:raid-swing var(--raid-time) var(--swing) both}
+.titan-raid.is-playing .raid-free-arm{animation:raid-wave var(--raid-time) var(--arrival) both}
+.titan-raid.is-playing .raid-titan-2 .raid-puppet{animation:raid-oops var(--raid-time) .24s both;transform-origin:50% 90%}
+.titan-raid.is-playing .raid-speech{animation:raid-speech var(--raid-time) both}
+.titan-raid.is-playing .raid-target{animation:raid-rattle var(--raid-time) both}
+.titan-raid.is-playing .raid-target .crack{animation:raid-crack var(--raid-time) both}
+.titan-raid.is-playing .bonk-one{animation:raid-bonk-one var(--raid-time) both}
+.titan-raid.is-playing .bonk-two{animation:raid-bonk-two var(--raid-time) both}
+.titan-raid.is-playing .bonk-three{animation:raid-bonk-three var(--raid-time) both}
+.titan-raid.is-playing .raid-dust{animation:raid-dust var(--raid-time) both}
+.titan-raid.is-playing .raid-spark{animation:raid-sparks var(--raid-time) both}
+.raid-no-hit .raid-crew,.raid-no-hit .raid-speech{opacity:1}
+@keyframes raid-arrive-leave{0%{opacity:0;transform:translate(-150%,30%) rotate(-14deg)}12%{opacity:1;transform:translate(-10%,-6%) rotate(7deg)}21%,72%{opacity:1;transform:translate(0,0) rotate(0)}80%{opacity:1;transform:translate(0,-7%) rotate(-6deg)}100%{opacity:0;transform:translate(170%,25%) rotate(17deg)}}
+@keyframes raid-swing{0%,26%{transform:rotate(-16deg)}32%{transform:rotate(-90deg)}38%{transform:rotate(36deg)}43%{transform:rotate(-22deg)}51%,100%{transform:rotate(-12deg)}}
+@keyframes raid-wave{0%,18%,70%,100%{transform:rotate(0)}8%,13%{transform:rotate(23deg)}34%,45%{transform:rotate(-16deg)}}
+@keyframes raid-oops{0%,53%,83%,100%{transform:rotate(0)}60%{transform:rotate(19deg) translateY(7%)}67%{transform:rotate(-12deg)}74%{transform:rotate(7deg)}}
+@keyframes raid-speech{0%,56%,84%,100%{opacity:0}61%,79%{opacity:1}}
+@keyframes raid-rattle{0%,35%,42%,48%,55%,100%{transform:translateX(-50%) rotate(0)}38%,44%,50%{transform:translateX(-53%) rotate(-7deg)}40%,46%,52%{transform:translateX(-47%) rotate(6deg)}}
+@keyframes raid-crack{0%,35%{opacity:0}39%,100%{opacity:1}}
+@keyframes raid-bonk-one{0%,34%,43%,100%{opacity:0}37%,40%{opacity:1}}
+@keyframes raid-bonk-two{0%,40%,49%,100%{opacity:0}43%,46%{opacity:1}}
+@keyframes raid-bonk-three{0%,46%,56%,100%{opacity:0}49%,53%{opacity:1}}
+@keyframes raid-dust{0%,35%,64%,100%{opacity:0;transform:translate(-50%,-25%) scale(.25)}39%,49%{opacity:.9;transform:translate(-50%,-25%) scale(1)}60%{opacity:0;transform:translate(-50%,-60%) scale(1.4)}}
+@keyframes raid-sparks{0%,35%,62%,100%{opacity:0;transform:translate(0,0) scale(.3)}39%,47%{opacity:1;transform:translate(calc(var(--dx)*.5),calc(var(--dy)*.5)) scale(1)}59%{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(75deg) scale(.6)}}
+@media(prefers-reduced-motion:reduce){.titan-raid.is-playing *{animation:none!important}.titan-raid .raid-crew{opacity:1}.titan-raid .raid-speech,.titan-raid .raid-skip{display:none}.titan-raid .raid-impact{display:none}.titan-raid .raid-target .crack{opacity:1}}
