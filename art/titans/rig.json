@@ -1,0 +1,307 @@
+{
+  "source": "assets/titans/watercolor-atlas.png",
+  "source_sha256": "995c984bbe2cedb1a49be7a67c0f4e5945bcc1fa750d4e1b160a97d07fe7b9c2",
+  "source_size": [
+    1536,
+    1024
+  ],
+  "engine": "DOM / SVG raster clipping + CSS transforms",
+  "canvas": [
+    576,
+    728
+  ],
+  "padding": 32,
+  "alpha_threshold": 8,
+  "safe_margin_px": 24,
+  "characters": [
+    {
+      "id": "leader",
+      "body_rect": [
+        0,
+        0,
+        512,
+        664
+      ],
+      "arm_rect": [
+        0,
+        664,
+        512,
+        360
+      ],
+      "body_anchor": [
+        386,
+        325
+      ],
+      "arm_anchor": [
+        221,
+        199
+      ],
+      "pivot_canvas": [
+        418,
+        357
+      ],
+      "layer_order": [
+        "arm",
+        "body"
+      ],
+      "audit": {
+        "body": {
+          "alpha_bbox": [
+            22,
+            18,
+            453,
+            657
+          ],
+          "padded_margins": [
+            54,
+            50,
+            91,
+            39
+          ],
+          "safe_margin_pass": true
+        },
+        "arm": {
+          "alpha_bbox": [
+            114,
+            13,
+            397,
+            347
+          ],
+          "cell_margins": [
+            114,
+            13,
+            115,
+            13
+          ],
+          "in_bounds": true
+        }
+      },
+      "hand": "left",
+      "arm_generation_crop": [
+        0,
+        0,
+        528,
+        1024
+      ],
+      "arm_trim": [
+        17,
+        204,
+        523,
+        800
+      ],
+      "arm_scale": 0.5704697986577181,
+      "arm_placement": [
+        111,
+        10
+      ]
+    },
+    {
+      "id": "curly",
+      "body_rect": [
+        512,
+        0,
+        512,
+        664
+      ],
+      "arm_rect": [
+        512,
+        664,
+        512,
+        360
+      ],
+      "body_anchor": [
+        386,
+        330
+      ],
+      "arm_anchor": [
+        218,
+        198
+      ],
+      "pivot_canvas": [
+        418,
+        362
+      ],
+      "layer_order": [
+        "arm",
+        "body"
+      ],
+      "audit": {
+        "body": {
+          "alpha_bbox": [
+            48,
+            18,
+            455,
+            657
+          ],
+          "padded_margins": [
+            80,
+            50,
+            89,
+            39
+          ],
+          "safe_margin_pass": true
+        },
+        "arm": {
+          "alpha_bbox": [
+            127,
+            13,
+            383,
+            346
+          ],
+          "cell_margins": [
+            127,
+            13,
+            129,
+            14
+          ],
+          "in_bounds": true
+        }
+      },
+      "hand": "left",
+      "arm_generation_crop": [
+        528,
+        0,
+        1036,
+        1024
+      ],
+      "arm_trim": [
+        11,
+        203,
+        475,
+        802
+      ],
+      "arm_scale": 0.5676126878130217,
+      "arm_placement": [
+        124,
+        10
+      ]
+    },
+    {
+      "id": "elder",
+      "body_rect": [
+        1024,
+        0,
+        512,
+        664
+      ],
+      "arm_rect": [
+        1024,
+        664,
+        512,
+        360
+      ],
+      "body_anchor": [
+        393,
+        321
+      ],
+      "arm_anchor": [
+        214,
+        199
+      ],
+      "pivot_canvas": [
+        425,
+        353
+      ],
+      "layer_order": [
+        "arm",
+        "body"
+      ],
+      "audit": {
+        "body": {
+          "alpha_bbox": [
+            66,
+            26,
+            465,
+            656
+          ],
+          "padded_margins": [
+            98,
+            58,
+            79,
+            40
+          ],
+          "safe_margin_pass": true
+        },
+        "arm": {
+          "alpha_bbox": [
+            125,
+            13,
+            387,
+            347
+          ],
+          "cell_margins": [
+            125,
+            13,
+            125,
+            13
+          ],
+          "in_bounds": true
+        }
+      },
+      "hand": "left",
+      "arm_generation_crop": [
+        1036,
+        0,
+        1536,
+        1024
+      ],
+      "arm_trim": [
+        7,
+        203,
+        478,
+        801
+      ],
+      "arm_scale": 0.568561872909699,
+      "arm_placement": [
+        122,
+        10
+      ]
+    }
+  ],
+  "motion": {
+    "duration_ms": 5200,
+    "repeats": 1,
+    "arm_degrees": [
+      [
+        0,
+        -16
+      ],
+      [
+        26,
+        -16
+      ],
+      [
+        32,
+        -90
+      ],
+      [
+        38,
+        36
+      ],
+      [
+        43,
+        -22
+      ],
+      [
+        51,
+        -12
+      ],
+      [
+        100,
+        -12
+      ]
+    ],
+    "arm_delays_ms": [
+      0,
+      320,
+      640
+    ],
+    "body_source_reused": true,
+    "resampling": "Browser affine transforms resample moved layers; no pixel-identical rendered-frame claim."
+  },
+  "arm_hand": "anatomical-left",
+  "original_body_source": "art/titans/original-atlas.png",
+  "left_arm_source": "art/titans/left-arm-source.png",
+  "body_pixels_preserved": true,
+  "body_rgba_sha256": "5f124f31a0ba896702a3ee6caf9d7af5ab5e4cb85e4db22ef7ddd256fb17decc"
+}

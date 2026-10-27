@@ -10,21 +10,18 @@ export function claimRaidPlayback(result) {
  return true;
 }
 
+const atlas='assets/titans/watercolor-atlas.png';
+const rigs=[
+ {name:'왕관 쓴 티탄',column:0,shoulder:[386,325],arm:[221,199]},
+ {name:'곱슬머리 티탄',column:1,shoulder:[386,330],arm:[218,198]},
+ {name:'덥수룩한 티탄',column:2,shoulder:[393,321],arm:[214,199]}
+];
 function titan(index) {
- const names = ['왕관 쓴 티탄','곱슬머리 티탄','덥수룩한 티탄'];
- const hair = [
-  '<path d="M40 62 35 39 56 42 66 24 83 35 102 24 111 43 137 39 140 76 124 95 53 91Z" fill="var(--hair)"/><path d="M48 39 45 12 65 24 85 6 103 25 126 14 122 42Z" fill="#d0ad5d"/><path d="m54 34 60-1" stroke="#f5dc94"/>',
-  '<path d="M40 82Q20 74 35 60Q21 44 42 39Q39 17 62 29Q73 9 88 27Q111 11 116 35Q144 27 139 51Q156 62 140 79L124 96 51 97Z" fill="var(--hair)"/><path d="M44 48Q89 30 134 49" stroke="#a99b71" stroke-width="8"/>',
-  '<path d="M37 79 28 57 40 42 47 27 68 31 86 19 104 31 129 26 135 45 146 57 137 86 113 103 52 98Z" fill="var(--hair)"/><path d="m47 45 20-6m48 2 13 5" stroke="#d9c8a2"/>'
- ][index];
- return `<svg viewBox="0 0 180 220" class="raid-puppet" role="img" aria-label="${names[index]}"><g stroke="#594c3f" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
- <ellipse cx="88" cy="209" rx="52" ry="7" fill="#55432c" opacity=".12" stroke="none"/>
- <g class="raid-legs"><path d="m64 166-5 29-17 8q-5 11 18 9l20-8 7-35M105 167l4 29 21 6q10 11-14 11l-20-9-4-34" fill="#a4875d"/><path d="m58 193 20 8m31-8-14 8" fill="none"/></g>
- <path d="M56 96Q87 81 119 99l17 68q-41 25-92 0Z" fill="var(--robe)"/><path d="m72 99-8 59 48 10m-59-18 71 1" stroke="#f0d59b" fill="none" stroke-width="7"/><path d="m68 109 9 30m32-33-6 31" fill="none" opacity=".3"/>
- <g class="raid-free-arm"><path d="M55 107Q32 114 30 139l17 6 17-23" fill="#d7b38e"/><path d="m29 137-7 13 4 10 12-4 10-12" fill="#dfbd99"/></g>
- <g class="raid-hammer-arm"><path d="M117 105q25 10 31-6l9-21-14-7-14 23-12-2Z" fill="#dfbd99"/><path d="m148 89 5-40" stroke="#936843" stroke-width="10"/><path d="M132 29q19-7 42 0l-1 25q-22 7-43-1Z" fill="#b68e5d"/><path d="m139 32-1 19m27-19-1 20" stroke="#e2c48b" stroke-width="4"/><path d="m149 79 10-1" stroke="#b28a64"/></g>
- <g class="raid-head">${hair}<ellipse cx="88" cy="64" rx="43" ry="37" fill="#dfbd99"/><path d="M47 72q11 20 19 3 19 19 42 0 12 15 22-6l-1 32-13-3-4 18-16-8-12 13-13-14-17 5-3-18-13-1Z" fill="var(--hair)"/><path d="m64 70 9 6 12-1m10 0 11 1 8-7" fill="none"/><path d="m64 48 15 3m20 0 15-6" stroke-width="5"/><path d="M69 58v3m38-4v3" stroke-width="5"/><path d="m86 59-5 10 10 1" fill="none" stroke="#b58e6a"/><ellipse cx="58" cy="70" rx="7" ry="4" fill="#c68d75" stroke="none" opacity=".5"/><ellipse cx="117" cy="69" rx="7" ry="4" fill="#c68d75" stroke="none" opacity=".5"/><path d="m81 85 9 3 8-4" fill="none" stroke="#f5e5c5" stroke-width="3"/></g>
- </g></svg>`;
+ const rig=rigs[index],x=rig.column*512;
+ const [px,py]=rig.shoulder.map(v=>v+32),[ax,ay]=rig.arm;
+ // Clip the original raster atlas; only the detached hammer arm rotates.
+ const crop=(part,y)=>`<g clip-path="url(#titan-${index}-${part})"><image href="${atlas}" x="${-x}" y="${-y}" width="1536" height="1024"/></g>`;
+ return `<svg viewBox="0 0 576 728" class="raid-puppet" role="img" aria-label="${rig.name}"><defs><clipPath id="titan-${index}-body"><rect width="512" height="664"/></clipPath><clipPath id="titan-${index}-arm"><rect width="512" height="360"/></clipPath></defs><g class="raid-hammer-arm" style="transform-origin:${px}px ${py}px;transform-box:view-box"><g transform="translate(${px-ax} ${py-ay})">${crop('arm',664)}</g></g><g transform="translate(32 32)">${crop('body',0)}</g></svg>`;
 }
 
 export function titanRaidMarkup({scene,result,worldName,play=false}) {
@@ -36,6 +33,13 @@ export function titanRaidMarkup({scene,result,worldName,play=false}) {
 export function bindTitanRaid(root) {
  const raid = root.querySelector('.titan-raid');
  if (!raid) return;
+ // Pause the finite scene until its illustration is ready on a first uncached visit.
+ if (raid.classList.contains('is-playing') && typeof Image === 'function') {
+  const image=new Image();
+  image.onload=image.onerror=()=>raid.classList.remove('is-loading');
+  image.src=atlas;
+  if (!image.complete) raid.classList.add('is-loading');
+ }
  const scene = raid.querySelector('.garden-scene');
  const hit = raid.dataset.raidHit;
  const target = hit && scene.querySelector(`.garden-slot.${hit}`);

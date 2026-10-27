@@ -1,7 +1,48 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {parseHTML} from 'linkedom';
+import {readFile} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
 import {claimRaidPlayback,titanRaidMarkup,bindTitanRaid,skipTitanRaid} from '../titan-raid.js';
+
+test('the watercolor rig crops six distinct, in-bounds parts from the original PNG',async()=>{
+ const rig=JSON.parse(await readFile(new URL('../art/titans/rig.json',import.meta.url)));
+ const png=await readFile(new URL('../'+rig.source,import.meta.url));
+ assert.equal(createHash('sha256').update(png).digest('hex'),rig.source_sha256);
+ assert.deepEqual([png.readUInt32BE(16),png.readUInt32BE(20)],rig.source_size);
+ const {document}=parseHTML(titanRaidMarkup({scene:'',result:{hit:'left'},worldName:'정원'}));
+ const puppets=[...document.querySelectorAll('.raid-puppet')];
+ assert.equal(puppets.length,3);
+ const ids=[...document.querySelectorAll('[id]')].map(el=>el.id);
+ assert.equal(new Set(ids).size,6);
+ for(const [index,c] of rig.characters.entries()){
+  const images=puppets[index].querySelectorAll('image');assert.equal(images.length,2);
+  for(const [part,image] of [['arm',images[0]],['body',images[1]]]){
+   const [x,y,w,h]=c[part+'_rect'];
+   assert.ok(x>=0&&y>=0&&x+w<=rig.source_size[0]&&y+h<=rig.source_size[1]);
+   assert.equal(image.getAttribute('href'),rig.source);
+   assert.equal(Number(image.getAttribute('x')),-x||0);
+   assert.equal(Number(image.getAttribute('y')),-y||0);
+   const rect=document.getElementById(`titan-${index}-${part}`).firstElementChild;
+   assert.equal(Number(rect.getAttribute('width')),w);assert.equal(Number(rect.getAttribute('height')),h);
+  }
+  assert.ok(puppets[index].querySelector('.raid-hammer-arm').getAttribute('style').includes(`transform-origin:${c.pivot_canvas[0]}px ${c.pivot_canvas[1]}px`));
+ }
+});
+
+test('the finite raid waits for uncached artwork without blocking skip',()=>{
+ const original=globalThis.Image;let image;
+ globalThis.Image=class {constructor(){image=this;this.complete=false;}};
+ try{
+  const {document}=parseHTML(titanRaidMarkup({scene:'<section class="garden-scene"></section>',result:{hit:'left'},worldName:'정원',play:true}));
+  bindTitanRaid(document);const raid=document.querySelector('.titan-raid');
+  assert.ok(raid.classList.contains('is-loading'));
+  assert.equal(image.src,'assets/titans/watercolor-atlas.png');
+  skipTitanRaid(document);image.onload();
+  assert.equal(raid.classList.contains('is-loading'),false);
+  assert.equal(raid.classList.contains('is-playing'),false);
+ }finally{globalThis.Image=original;}
+});
 
 test('an early-exit raid plays once per history id; a redraw cannot create another attack',()=>{
  assert.equal(claimRaidPlayback({id:'raid-no-attack',attack:false,hit:'left'}),false);
