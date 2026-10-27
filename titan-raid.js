@@ -50,10 +50,15 @@ export function bindTitanRaid(root) {
  }
  const skip = raid.querySelector('.raid-skip');
  if (!raid.classList.contains('is-playing')) skip.hidden = true;
+ if (globalThis.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches) {
+  skipTitanRaid(root);
+  return;
+ }
  // A finite CSS animation can finish without timers, network calls or save mutations.
- raid.querySelector('.raid-titan-2').addEventListener('animationend',event=>{
-  if (event.animationName === 'raid-arrive-leave') skipTitanRaid(root);
- });
+ const finish=event=>{
+  if (event.animationName === 'raid-arrive-leave' && root.querySelector('.titan-raid') === raid) skipTitanRaid(root);
+ };
+ for(const name of ['animationend','animationcancel'])raid.querySelector('.raid-titan-2').addEventListener(name,finish);
 }
 
 export function skipTitanRaid(root) {

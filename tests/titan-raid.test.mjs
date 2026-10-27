@@ -39,3 +39,15 @@ test('a fully damaged space shows the trio leaving without depicting or recordin
  assert.match(document.querySelector('.raid-summary').textContent,/더 손상시킬 자리가 없어/);
  assert.equal(document.querySelector('.raid-skip').hidden,true);
 });
+
+test('reduced motion settles immediately so an animation with no end event cannot block updates',()=>{
+ const original=globalThis.matchMedia;
+ globalThis.matchMedia=()=>({matches:true});
+ try{
+  const {document}=parseHTML(titanRaidMarkup({scene:'<section class="garden-scene"></section>',result:{attack:true,hit:'left'},worldName:'정원',play:true}));
+  bindTitanRaid(document);
+  assert.equal(document.querySelector('.is-playing'),null);
+  assert.ok(document.querySelector('.is-settled'));
+  assert.equal(document.querySelector('.raid-skip').hidden,true);
+ }finally{globalThis.matchMedia=original;}
+});
